@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.0.3",
   "info": {
     "title": "Joomla Web Services API",
     "description": "## Joomla Web Services for Joomla! 6. \n- Set your own values for Authentication and Variables per the steps below\n    \n- Test a generic GET request from the list to then confirm your authentication is working and your base_url and base_path is set correctly.\n    \n\n## Authentication\n\nAuthentication is done using a Joomla API Token. To get the token, go to your Super User profile in your Joomla 6 Installation and activate then copy the API key. \n- In the Value field, paste your Joomla API Token\n    \n- For the Add To field, leave the value as \"Header\"\n    \n- Click Update to save the settings or click on Variables tab to modify your Base Path variable.\n    \n\nIf you prefer a video about how to set up your Joomla API Token here is one:\n\n[Short video how to set up Joomla API Token](https://youtube.com/clip/UgkxfHFK1vhr1oCpJvhBWwC8Mvm0LBB2WZ7A?si=nVa8FHGBlBUNxIek)\n\nFull video is :\n\n<video src=\"https://youtube.com/embed/lT9qodsvfZg\" width=\"340\"></video>\n\nJoomla 4 tutorial: Using the Web Services API\n\n## URLs\n\nThe URLs are set via _base_url_ and _base_path_. You should set this variable within your collection.\n\n- Click the 3 dots on the collection.\n    \n- Select Edit.\n    \n- Click on the variables tab.\n    \n- Add (or update) the _base_url_ and _base_path_ variable, setting the Initial Value field to the URL for your Joomla for installation.\n    \n\n## Videos\n\n[YouTube playlist about Joomla Web Services / APIs](https://www.youtube.com/playlist?list=PLsg93PS_2NeL850YZFlAi1Eb7hwxETNkX)\n\n## Setup\n\nYou might want to consider using :\n\n[https://github.com/muhme/joomla-branches-tester](https://github.com/muhme/joomla-branches-tester)\n\n## Feedback\n\n[https://github.com/alexandreelise/j4x-api-collection](https://github.com/alexandreelise/j4x-api-collection) for updates and information.\n\n",
@@ -40,11 +40,11 @@
                 "type": "object",
                 "properties": {
                   "catid": {
-                    "type": "string",
-                    "example": "Future"
+                    "type": "integer",
+                    "example": 3
                   },
                   "clicks": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "custombannercode": {
@@ -71,16 +71,16 @@
                         "example": "Managed user-facing alliance"
                       },
                       "height": {
-                        "type": "string",
-                        "example": ""
+                        "type": "integer",
+                        "example": 480
                       },
                       "imageurl": {
                         "type": "string",
-                        "example": "http://placeimg.com/640/480/animals"
+                        "example": "images/banners/banner.jpg"
                       },
                       "width": {
-                        "type": "string",
-                        "example": ""
+                        "type": "integer",
+                        "example": 640
                       }
                     }
                   }
@@ -89,7 +89,7 @@
               "examples": {
                 "banners": {
                   "value": {
-                    "catid": "Future",
+                    "catid": "3",
                     "clicks": 0,
                     "custombannercode": "",
                     "description": "Et sed ducimus aut dolore aperiam sed incidunt ea est. Excepturi sed accusantium quasi quam doloribus laudantium omnis omnis. Similique earum sint. Non natus iusto. Autem nisi maiores dicta ipsum assumenda sit. Est eum quaerat totam voluptatum.",
@@ -97,9 +97,9 @@
                     "name": "Adaptive dedicated monitoring",
                     "params": {
                       "alt": "Managed user-facing alliance",
-                      "height": "",
-                      "imageurl": "http://placeimg.com/640/480/animals",
-                      "width": ""
+                      "height": 480,
+                      "imageurl": "https://placeimg.com/640/480/animals",
+                      "width": 640
                     }
                   }
                 }
@@ -225,7 +225,7 @@
                     "example": "Clients"
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   }
                 }
@@ -364,7 +364,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "alias": {
@@ -387,17 +387,17 @@
                     "type": "object",
                     "properties": {
                       "workflow_id": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 1
                       }
                     }
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -482,7 +482,7 @@
                     "example": "Enim corporis non quidem quia ad ut deserunt delectus dolores."
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -714,7 +714,7 @@
                     "example": "44c3021f-8916-4832-9d16-6cd1048de5d4"
                   },
                   "catid": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 4
                   },
                   "language": {
@@ -786,7 +786,7 @@
             "text/plain": {
               "examples": {
                 "contacts/{contact_id}": {
-                  "value": "{\n    \"alias\": \"93b24bb5-f7e1-4667-8564-549f217d7d96\",\n    \"catid\": 4,\n    \"name\": \"Tyler Boyer\",\n    \"con_position\": Lead Response Liaison,\n    \"address\": 049 Lou Light,\n    \"suburb\": null,\n    \"state\": null,\n    \"country\": \"Croatia\",\n    \"postcode\": null,\n    \"telephone\": \"541-436-4398\",\n    \"fax\": \"522-559-4136\",\n    \"misc\": \"Assumenda et veritatis illum in ea velit voluptas. Similique facere architecto eius dicta nihil voluptas. Quia cupiditate sed consequatur dolorum totam cupiditate nisi non magnam. Rerum minima doloribus corrupti quas aperiam officia.\n \rExercitationem et in quia iste. Doloribus nemo accusamus ut blanditiis. Qui atque amet accusantium repellendus vel. Tempore vel et ratione ut. Iste corporis perferendis voluptatem eum magni voluptas illo sed.\n \rTemporibus beatae a velit et ex consequuntur. Sit ex suscipit et mollitia ab doloribus ab. Deserunt quia rerum voluptatum.\",\n    \"image\": \"http://placeimg.com/640/480/people\",\n    \"email_to\": \"Loraine36@example.org\",\n    \"default_con\": 0,\n    \"user_id\": 0,\n    \"access\": 1,\n    \"mobile\": \"653-856-1355\",\n    \"webpage\": \"http://jaeden.com\"\n}"
+                  "value": "{\n    \"alias\": \"93b24bb5-f7e1-4667-8564-549f217d7d96\",\n    \"catid\": 4,\n    \"name\": \"Tyler Boyer\",\n    \"con_position\": Lead Response Liaison,\n    \"address\": 049 Lou Light,\n    \"suburb\": null,\n    \"state\": null,\n    \"country\": \"Croatia\",\n    \"postcode\": null,\n    \"telephone\": \"541-436-4398\",\n    \"fax\": \"522-559-4136\",\n    \"misc\": \"Assumenda et veritatis illum in ea velit voluptas. Similique facere architecto eius dicta nihil voluptas. Quia cupiditate sed consequatur dolorum totam cupiditate nisi non magnam. Rerum minima doloribus corrupti quas aperiam officia.\n \rExercitationem et in quia iste. Doloribus nemo accusamus ut blanditiis. Qui atque amet accusantium repellendus vel. Tempore vel et ratione ut. Iste corporis perferendis voluptatem eum magni voluptas illo sed.\n \rTemporibus beatae a velit et ex consequuntur. Sit ex suscipit et mollitia ab doloribus ab. Deserunt quia rerum voluptatum.\",\n    \"image\": \"https://placeimg.com/640/480/people\",\n    \"email_to\": \"Loraine36@example.org\",\n    \"default_con\": 0,\n    \"user_id\": 0,\n    \"access\": 1,\n    \"mobile\": \"653-856-1355\",\n    \"webpage\": \"https://jaeden.com\"\n}"
                 }
               }
             }
@@ -901,7 +901,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -917,7 +917,7 @@
                     "example": ""
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -990,11 +990,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -1224,7 +1224,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -1240,7 +1240,7 @@
                     "example": ""
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -1313,11 +1313,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -1505,7 +1505,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -1521,7 +1521,7 @@
                     "example": ""
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -1594,11 +1594,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -1842,7 +1842,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "alias": {
@@ -1865,17 +1865,17 @@
                     "type": "object",
                     "properties": {
                       "workflow_id": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 1
                       }
                     }
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -1960,7 +1960,7 @@
                     "example": "Esse voluptate consequatur et ad repellendus mollitia maiores."
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -2119,7 +2119,7 @@
                     "example": "My text"
                   },
                   "catid": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 64
                   },
                   "language": {
@@ -2204,7 +2204,7 @@
                 "type": "object",
                 "properties": {
                   "catid": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 64
                   },
                   "title": {
@@ -2270,7 +2270,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -2293,13 +2293,13 @@
                         "example": "alnum"
                       },
                       "maxlength": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 40
                       }
                     }
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -2372,11 +2372,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -2568,11 +2568,11 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "checked_out": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "context": {
@@ -2580,7 +2580,7 @@
                     "example": "com_content.article"
                   },
                   "created_by": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "description": {
@@ -2605,11 +2605,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -2759,7 +2759,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -2782,13 +2782,13 @@
                         "example": "alnum"
                       },
                       "maxlength": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 40
                       }
                     }
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -2861,11 +2861,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -3057,7 +3057,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "alias": {
@@ -3080,17 +3080,17 @@
                     "type": "object",
                     "properties": {
                       "workflow_id": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 1
                       }
                     }
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -3175,7 +3175,7 @@
                     "example": "Animi deserunt ratione dolor sit officia asperiores odit."
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -3243,11 +3243,11 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "autostart": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "description": {
@@ -3263,7 +3263,7 @@
                     "example": "*"
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -3426,7 +3426,7 @@
                     "example": "asynchronous"
                   },
                   "interactive_type": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "language": {
@@ -3442,7 +3442,7 @@
                     "example": "top"
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "target": {
@@ -3454,7 +3454,7 @@
                     "example": "Auer Inc"
                   },
                   "type": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 2
                   },
                   "url": {
@@ -3682,7 +3682,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "description": {
@@ -3706,11 +3706,11 @@
                     "example": ""
                   },
                   "ordering": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "sef": {
@@ -4323,7 +4323,7 @@
                 "type": "object",
                 "properties": {
                   "client_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "description": {
@@ -4890,7 +4890,7 @@
                     "example": "<p>text</p>"
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "subject": {
@@ -4898,11 +4898,11 @@
                     "example": "text"
                   },
                   "user_id_from": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 773
                   },
                   "user_id_to": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 772
                   }
                 }
@@ -4977,11 +4977,11 @@
                     "example": "new text"
                   },
                   "user_id_from": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 773
                   },
                   "user_id_to": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 772
                   }
                 }
@@ -5373,7 +5373,7 @@
           "Newsfeeds"
         ],
         "summary": "newsfeeds/feeds",
-        "description": "Generated from a curl request: \ncurl -X POST '//newsfeeds/feeds' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"access\":1,\"alias\":\"alias\",\"catid\":5,\"description\":\"\",\"images\":{\"float_first\":\"\",\"float_second\":\"\",\"image_first\":\"\",\"image_first_alt\":\"\",\"image_first_caption\":\"\",\"image_second\":\"\",\"image_second_alt\":\"\",\"image_second_caption\":\"\"},\"language\":\"*\",\"link\":\"http://samoylov/joomla/gsoc19_webservices/index.php\",\"metadata\":{\"hits\":\"\",\"rights\":\"\",\"robots\":\"\",\"tags\":{\"tags\":\"\",\"typeAlias\":null}},\"metadesc\":\"\",\"metakey\":\"\",\"name\":\"Name\",\"ordering\":1,\"params\":{\"feed_character_count\":\"\",\"feed_display_order\":\"\",\"newsfeed_layout\":\"\",\"show_feed_description\":\"\",\"show_feed_image\":\"\",\"show_item_description\":\"\"},\"published\":1}'",
+        "description": "Generated from a curl request: \ncurl -X POST '//newsfeeds/feeds' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"access\":1,\"alias\":\"alias\",\"catid\":5,\"description\":\"\",\"images\":{\"float_first\":\"\",\"float_second\":\"\",\"image_first\":\"\",\"image_first_alt\":\"\",\"image_first_caption\":\"\",\"image_second\":\"\",\"image_second_alt\":\"\",\"image_second_caption\":\"\"},\"language\":\"*\",\"link\":\"https://samoylov/joomla/gsoc19_webservices/index.php\",\"metadata\":{\"hits\":\"\",\"rights\":\"\",\"robots\":\"\",\"tags\":{\"tags\":\"\",\"typeAlias\":null}},\"metadesc\":\"\",\"metakey\":\"\",\"name\":\"Name\",\"ordering\":1,\"params\":{\"feed_character_count\":\"\",\"feed_display_order\":\"\",\"newsfeed_layout\":\"\",\"show_feed_description\":\"\",\"show_feed_image\":\"\",\"show_item_description\":\"\"},\"published\":1}'",
         "operationId": "newsfeedsFeeds",
         "requestBody": {
           "content": {
@@ -5382,7 +5382,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "alias": {
@@ -5390,7 +5390,7 @@
                     "example": "alias"
                   },
                   "catid": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 5
                   },
                   "description": {
@@ -5440,7 +5440,7 @@
                   },
                   "link": {
                     "type": "string",
-                    "example": "http://samoylov/joomla/gsoc19_webservices/index.php"
+                    "example": "https://samoylov/joomla/gsoc19_webservices/index.php"
                   },
                   "metadata": {
                     "type": "object",
@@ -5485,7 +5485,7 @@
                     "example": "Name"
                   },
                   "ordering": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "params": {
@@ -5518,7 +5518,7 @@
                     }
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   }
                 }
@@ -5541,7 +5541,7 @@
                       "image_second_caption": ""
                     },
                     "language": "*",
-                    "link": "http://samoylov/joomla/gsoc19_webservices/index.php",
+                    "link": "https://samoylov/joomla/gsoc19_webservices/index.php",
                     "metadata": {
                       "hits": "",
                       "rights": "",
@@ -5609,7 +5609,7 @@
           "Newsfeeds"
         ],
         "summary": "newsfeeds/feeds/{feed_id}",
-        "description": "Generated from a curl request: \ncurl -X PATCH '//newsfeeds/feeds/' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"access\":1,\"alias\":\"test2\",\"catid\":5,\"description\":\"\",\"link\":\"http://samoylov/joomla/gsoc19_webservices/index.php\",\"metadesc\":\"\",\"metakey\":\"\",\"name\":\"Test\"}'",
+        "description": "Generated from a curl request: \ncurl -X PATCH '//newsfeeds/feeds/' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"access\":1,\"alias\":\"test2\",\"catid\":5,\"description\":\"\",\"link\":\"https://samoylov/joomla/gsoc19_webservices/index.php\",\"metadesc\":\"\",\"metakey\":\"\",\"name\":\"Test\"}'",
         "operationId": "newsfeedsFeedsFeedId1",
         "requestBody": {
           "content": {
@@ -5618,7 +5618,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "alias": {
@@ -5626,7 +5626,7 @@
                     "example": "test2"
                   },
                   "catid": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 5
                   },
                   "description": {
@@ -5635,7 +5635,7 @@
                   },
                   "link": {
                     "type": "string",
-                    "example": "http://samoylov/joomla/gsoc19_webservices/index.php"
+                    "example": "https://samoylov/joomla/gsoc19_webservices/index.php"
                   },
                   "metadesc": {
                     "type": "string",
@@ -5658,7 +5658,7 @@
                     "alias": "test2",
                     "catid": 5,
                     "description": "",
-                    "link": "http://samoylov/joomla/gsoc19_webservices/index.php",
+                    "link": "https://samoylov/joomla/gsoc19_webservices/index.php",
                     "metadesc": "",
                     "metakey": "",
                     "name": "Test"
@@ -5867,11 +5867,11 @@
                     "example": ""
                   },
                   "header": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 301
                   },
                   "hits": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "new_url": {
@@ -5883,7 +5883,7 @@
                     "example": "/content/art/12"
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "referer": {
@@ -6050,7 +6050,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "access_title": {
@@ -6074,7 +6074,7 @@
                     "example": ""
                   },
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "path": {
@@ -6082,7 +6082,7 @@
                     "example": "test"
                   },
                   "published": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -6411,8 +6411,8 @@
                 "type": "object",
                 "properties": {
                   "block": {
-                    "type": "string",
-                    "example": "0"
+                    "type": "integer",
+                    "example": 0
                   },
                   "email": {
                     "type": "string",
@@ -6421,23 +6421,25 @@
                   "groups": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "example": "2"
+                      "type": "integer",
+                      "example": 2
                     },
                     "example": [
                       "2"
                     ]
                   },
                   "id": {
-                    "type": "string",
-                    "example": "0"
+                    "type": "integer",
+                    "example": 0
                   },
                   "lastResetTime": {
                     "type": "string",
+                    "format": "date-time",
                     "example": ""
                   },
                   "lastvisitDate": {
                     "type": "string",
+                    "format": "date-time",
                     "example": ""
                   },
                   "name": {
@@ -6486,16 +6488,16 @@
                     "example": ""
                   },
                   "requireReset": {
-                    "type": "string",
-                    "example": "0"
+                    "type": "boolean",
+                    "example": 0
                   },
                   "resetCount": {
-                    "type": "string",
-                    "example": "0"
+                    "type": "integer",
+                    "example": 0
                   },
                   "sendEmail": {
-                    "type": "string",
-                    "example": "0"
+                    "type": "boolean",
+                    "example": 0
                   },
                   "username": {
                     "type": "string",
@@ -6506,12 +6508,12 @@
               "examples": {
                 "users": {
                   "value": {
-                    "block": "0",
+                    "block": 0,
                     "email": "test@example.org",
                     "groups": [
-                      "2"
+                      2
                     ],
-                    "id": "0",
+                    "id": 0,
                     "lastResetTime": "",
                     "lastvisitDate": "",
                     "name": "nnn",
@@ -6526,9 +6528,9 @@
                     "password": "qwerty",
                     "password2": "qwerty",
                     "registerDate": "",
-                    "requireReset": "0",
-                    "resetCount": "0",
-                    "sendEmail": "0",
+                    "requireReset": 0,
+                    "resetCount": 0,
+                    "sendEmail": 0,
                     "username": "ad"
                   }
                 }
@@ -6612,7 +6614,7 @@
                   "value": {
                     "email": "new@example.org",
                     "groups": [
-                      "2"
+                      2
                     ],
                     "name": "name",
                     "username": "username"
@@ -6668,7 +6670,7 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "context": {
@@ -6691,13 +6693,13 @@
                         "example": "alnum"
                       },
                       "maxlength": {
-                        "type": "number",
+                        "type": "integer",
                         "example": 40
                       }
                     }
                   },
                   "group_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "label": {
@@ -6770,11 +6772,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -6966,11 +6968,11 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "checked_out": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "context": {
@@ -6978,7 +6980,7 @@
                     "example": "com_users.user"
                   },
                   "created_by": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "description": {
@@ -7003,11 +7005,11 @@
                     }
                   },
                   "required": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 0
                   },
                   "state": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -7157,7 +7159,7 @@
                 "type": "object",
                 "properties": {
                   "parent_id": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "title": {
@@ -7470,15 +7472,15 @@
                 "type": "object",
                 "properties": {
                   "access": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "enabled": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                   },
                   "ordering": {
-                    "type": "number",
+                    "type": "integer",
                     "example": -9999
                   }
                 }
