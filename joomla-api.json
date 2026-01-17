@@ -4292,7 +4292,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/schemas/MediaFileResponse"
+            "description": "Media file created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileResponse"
+                }
+              }
+            }
           },
           "413": {
             "description": "Payload too large."
@@ -4391,7 +4398,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/schemas/MediaFileResponse"
+            "description": "Media file updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Media file not found."
