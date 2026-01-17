@@ -680,9 +680,9 @@
         "tags": [
           "Config Application"
         ],
-        "summary": "config/application",
-        "description": "Generated from a curl request: \ncurl -X GET '//config/application' -H 'X-Joomla-Token: '",
-        "operationId": "configApplication",
+        "summary": "Get Global Configuration",
+        "description": "Get the global configuration data.",
+        "operationId": "getApplicationConfig",
         "responses": {
           "200": {
             "description": "todo: response object"
@@ -693,9 +693,9 @@
         "tags": [
           "Config Application"
         ],
-        "summary": "config/application",
-        "description": "Generated from a curl request: \ncurl -X PATCH '//config/application' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"debug\":true,\"sitename\":\"123\"}'",
-        "operationId": "configApplication1",
+        "summary": "Update Global Configuration",
+        "description": "Update the global configuration data.",
+        "operationId": "updateApplicationConfig",
         "requestBody": {
           "content": {
             "application/json": {
@@ -708,7 +708,8 @@
                   },
                   "sitename": {
                     "type": "string",
-                    "example": "123"
+                    "description": "you can set all the fields of the application.xml form",
+                    "example": "The Name of the Site"
                   }
                 }
               },
@@ -716,7 +717,7 @@
                 "config/application": {
                   "value": {
                     "debug": true,
-                    "sitename": "123"
+                    "sitename": "The Name of the Site"
                   }
                 }
               }
@@ -730,14 +731,45 @@
         }
       }
     },
+
     "/api/index.php/v1/config/{component_name}": {
       "get": {
         "tags": [
           "Config Component"
         ],
-        "summary": "config/{component_name}",
-        "description": "Generated from a curl request: \ncurl -X GET '//config/' -H 'X-Joomla-Token: '",
-        "operationId": "configComponentName",
+        "summary": "Get Component Configuration",
+        "description": "Get the component configuration data.",
+        "operationId": "getComponentConfig",
+        "responses": {
+          "200": {
+            "description": "todo: response object"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Config Component"
+        ],
+        "summary": "Update Component Configuration",
+        "description": "Update configuration data of a component.",
+        "operationId": "updateComponentConfig",
+        "requestBody": {
+          "description": "Dependent on the component you can update other configuration items.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "examples": {
+                "config/component/com_content": {
+                  "value": {
+                    "show_title": false
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "todo: response object"
@@ -751,11 +783,12 @@
           "required": true,
           "schema": {
             "type": "string",
-            "example": "{component_name}"
+            "example": "com_content"
           }
         }
       ]
     },
+
     "/api/index.php/v1/contacts": {
       "get": {
         "tags": [
@@ -4292,7 +4325,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/schemas/MediaFileResponse"
+            "description": "Succesful media file upload.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileResponse"
+                }
+              }
+            }
           },
           "413": {
             "description": "Payload too large."
@@ -4304,16 +4344,16 @@
       }
     },
 
-    "/api/index.php/v1/media/files/{path}": {
+    "/api/index.php/v1/media/files/{thelocation}": {
     "parameters": [
       {
-        "name": "path",
+        "name": "thelocation",
         "in": "path",
         "required": true,
+        "description": "Directory path including adapter prefix (e.g. local-images:/test/test.png).",
         "schema": {
           "type": "string"
-        },
-        "description": "Directory path including adapter prefix (e.g. local-images:/test/test.png)."
+        }
       }
     ],
       "get": {
@@ -4391,7 +4431,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/schemas/MediaFileResponse"
+            "description": "Succesful media file update.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Media file not found."
@@ -7664,7 +7711,9 @@
             "type": "string",
             "enum": ["file"]
           },
-          "name": { "type": "string" },
+          "name": {
+            "type": "string"
+          },
           "path": { "type": "string" },
           "extension": { "type": "string" },
           "size": { "type": "integer" },
@@ -7698,10 +7747,12 @@
           "content": {
             "type": "string",
             "format": "byte",
-            "description": "Base64-encoded file content. Present in POST/PATCH responses, not returned by GET.\n\nTODO: Confirm whether content inclusion can be toggled via query parameters."
+            "description": "Base64-encoded file content. Present in POST/PATCH responses, not returned by GET.",
+            "example": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
           },
           "adapter": {
-            "type": "string"
+            "type": "string",
+            "example": "local-images"
           }
         }
       },
@@ -7716,7 +7767,7 @@
           },
           "id": {
             "type": "string",
-            "description": "Is always \"0\"."
+            "description": "Is always \"0\". We don't use an ID for media files."
           },
           "attributes": {
             "$ref": "#/components/schemas/MediaFileAttributes"
@@ -7777,12 +7828,14 @@
         "properties": {
           "path": {
             "type": "string",
-            "description": "Target media path including filename."
+            "description": "Target media path including filename. Prefix with the adapter name, otherwise the local-files adapter will be used as default.",
+            "example": "local-images:/test/blackpixel.png"
           },
           "content": {
             "type": "string",
             "format": "byte",
-            "description": "Base64-encoded file bytes (RFC 4648). For examples of how to use Media Files, please refer to\n\n[https://github.com/joomla/joomla-cms/blob/6.0-dev/tests/System/integration/api/com_media/Files.cy.js](https://github.com/joomla/joomla-cms/blob/6.0-dev/tests/System/integration/api/com_media/Files.cy.js)"
+            "description": "Base64-encoded file bytes (RFC 4648). For examples of how to use Media Files, please refer to\n\n/tests/System/integration/api/com_media/Files.cy.js in [https://github.com/joomla/joomla-cms](https://github.com/joomla/joomla-cms)",
+            "example": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQImWNgYGAAAAAEAAGjChXjAAAAAElFTkSuQmCC"
           }
         }
       },
