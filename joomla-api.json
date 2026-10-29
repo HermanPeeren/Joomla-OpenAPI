@@ -662,18 +662,7 @@
             "description": "todo: response object"
           }
         }
-      },
-      "parameters": [
-        {
-          "name": "banner_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "example": 1
-          }
-        }
-      ]
+      }
     },
     "/api/index.php/v1/config/application": {
       "get": {
