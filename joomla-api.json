@@ -3323,380 +3323,6 @@
         }
       ]
     },
-    "/api/index.php/v1/tours": {
-      "get": {
-        "tags": [
-          "Guided Tours"
-        ],
-        "summary": "tours",
-        "description": "tours",
-        "operationId": "tours1",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Guided Tours"
-        ],
-        "summary": "tours",
-        "description": "tours",
-        "operationId": "tours",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "access": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "autostart": {
-                    "type": "integer",
-                    "example": 0
-                  },
-                  "description": {
-                    "type": "string",
-                    "example": "3rd generation"
-                  },
-                  "extensions": {
-                    "type": "string",
-                    "example": "['*']"
-                  },
-                  "language": {
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "published": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "Handmade Frozen Shirt"
-                  },
-                  "uid": {
-                    "type": "string",
-                    "example": "9aa2d6cc-78b1-48e3-9cc8-463977696382"
-                  },
-                  "url": {
-                    "type": "string",
-                    "example": "administrator/index.php?option=com_content&view=articles"
-                  }
-                }
-              },
-              "examples": {
-                "tours": {
-                  "value": {
-                    "access": 1,
-                    "autostart": 0,
-                    "description": "3rd generation",
-                    "extensions": "['*']",
-                    "language": "*",
-                    "published": 1,
-                    "title": "Handmade Frozen Shirt",
-                    "uid": "9aa2d6cc-78b1-48e3-9cc8-463977696382",
-                    "url": "administrator/index.php?option=com_content&view=articles"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      }
-    },
-    "/api/index.php/v1/tours/{tour_id}": {
-      "get": {
-        "tags": [
-          "Guided Tours"
-        ],
-        "summary": "tours/{tour_id}",
-        "description": "tours/{tour_id}",
-        "operationId": "toursTourId",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Guided Tours"
-        ],
-        "summary": "tours/{tour_id}",
-        "description": "tours/{tour_id}",
-        "operationId": "toursTourId2",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Guided Tours"
-        ],
-        "summary": "tours/{tour_id}",
-        "description": "tours/{tour_id}",
-        "operationId": "toursTourId1",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string",
-                    "example": "Updated Small Concrete Car"
-                  }
-                }
-              },
-              "examples": {
-                "tours/{tour_id}": {
-                  "value": {
-                    "title": "Updated Small Concrete Car"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "tour_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "Delete a tour by id"
-        }
-      ]
-    },
-    "/api/index.php/v1/tours/{tour_id}/steps": {
-      "get": {
-        "tags": [
-          "Guided Tours Steps"
-        ],
-        "summary": "tours/{tour_id}/steps",
-        "description": "tours/{tour_id}/steps",
-        "operationId": "toursTourIdSteps1",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Guided Tours Steps"
-        ],
-        "summary": "tours/{tour_id}/steps",
-        "description": "tours/{tour_id}/steps",
-        "operationId": "toursTourIdSteps",
-        "parameters": [
-          {
-            "name": "cookie",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "XDEBUG_TRIGGER=StartForMe"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "created": {
-                    "type": "string",
-                    "example": "2024-11-04 22:00:00"
-                  },
-                  "description": {
-                    "type": "string",
-                    "example": "asynchronous"
-                  },
-                  "interactive_type": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "language": {
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "modified": {
-                    "type": "string",
-                    "example": "2024-11-04 22:00:00"
-                  },
-                  "position": {
-                    "type": "string",
-                    "example": "top"
-                  },
-                  "published": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "target": {
-                    "type": "string",
-                    "example": "#testElement"
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "Auer Inc"
-                  },
-                  "type": {
-                    "type": "integer",
-                    "example": 2
-                  },
-                  "url": {
-                    "type": "string",
-                    "example": "administrator/index.php?option=com_content&view=articles"
-                  }
-                }
-              },
-              "examples": {
-                "tours/{tour_id}/steps": {
-                  "value": {
-                    "created": "2024-11-04 22:00:00",
-                    "description": "asynchronous",
-                    "interactive_type": 1,
-                    "language": "*",
-                    "modified": "2024-11-04 22:00:00",
-                    "position": "top",
-                    "published": 1,
-                    "target": "#testElement",
-                    "title": "Auer Inc",
-                    "type": 2,
-                    "url": "administrator/index.php?option=com_content&view=articles"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "tour_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "23"
-          }
-        }
-      ]
-    },
-    "/api/index.php/v1/tours/{tour_id}/steps/{step_id}": {
-      "get": {
-        "tags": [
-          "Guided Tours Steps"
-        ],
-        "summary": "tours/{tour_id}/steps/{step_id}",
-        "description": "tours/{tour_id}/steps/{step_id}",
-        "operationId": "toursTourIdStepsStepId",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Guided Tours Steps"
-        ],
-        "summary": "tours/{tour_id}/steps/{step_id}",
-        "description": "tours/{tour_id}/steps/{step_id}",
-        "operationId": "toursTourIdStepsStepId1",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Guided Tours Steps"
-        ],
-        "summary": "tours/{tour_id}/steps/{step_id} Copy",
-        "description": "tours/{tour_id}/steps/{step_id} Copy",
-        "operationId": "toursTourIdStepsStepIdCopy",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "type": "string",
-                    "example": "Updated web-enabled"
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "Updated Stracke - VonRueden"
-                  }
-                }
-              },
-              "examples": {
-                "tours/{tour_id}/steps/{step_id} Copy": {
-                  "value": {
-                    "description": "Updated web-enabled",
-                    "title": "Updated Stracke - VonRueden"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "tour_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          }
-        },
-        {
-          "name": "step_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          }
-        }
-      ]
-    },
     "/api/index.php/v1/extensions": {
       "get": {
         "tags": [
@@ -3946,19 +3572,6 @@
           }
         }
       },
-      "parameters": [
-        {
-          "name": "language_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "{language_id}"
-          }
-        }
-      ]
-    },
-    "/api/index.php/v1/v1/languages/content/{language_id}": {
       "get": {
         "tags": [
           "Languages Content"
@@ -5976,19 +5589,6 @@
           }
         }
       },
-      "delete": {
-        "tags": [
-          "Privacy Consents"
-        ],
-        "summary": "privacy/consents/{consent_id}",
-        "description": "Generated from a curl request: \ncurl -X DELETE '//privacy/consents/' -H 'X-Joomla-Token: '",
-        "operationId": "privacyConsentsConsentId1",
-        "responses": {
-          "200": {
-            "description": "todo: response object"
-          }
-        }
-      },
       "parameters": [
         {
           "name": "consent_id",
@@ -6001,13 +5601,13 @@
         }
       ]
     },
-    "/api/index.php/v1/redirect": {
+    "/api/index.php/v1/redirects": {
       "post": {
         "tags": [
           "Redirects"
         ],
-        "summary": "redirect",
-        "description": "Generated from a curl request: \ncurl -X POST '//redirect' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"comment\":\"\",\"header\":301,\"hits\":0,\"new_url\":\"/content/art/99\",\"old_url\":\"/content/art/12\",\"published\":1,\"referer\":\"\"}'",
+        "summary": "redirects",
+        "description": "Generated from a curl request: \ncurl -X POST '//redirects' -H 'X-Joomla-Token: ' -H 'Content-Type: application/json' -d '{\"comment\":\"\",\"header\":301,\"hits\":0,\"new_url\":\"/content/art/99\",\"old_url\":\"/content/art/12\",\"published\":1,\"referer\":\"\"}'",
         "operationId": "redirect",
         "requestBody": {
           "content": {
@@ -6066,9 +5666,7 @@
             "description": "todo: response object"
           }
         }
-      }
-    },
-    "/api/index.php/v1/redirects": {
+      },
       "get": {
         "tags": [
           "Redirects"
@@ -7977,12 +7575,6 @@
     },
     {
       "name": "Content Categories Fields"
-    },
-    {
-      "name": "Guided Tours"
-    },
-    {
-      "name": "Guided Tours Steps"
     },
     {
       "name": "Installer",
