@@ -11,9 +11,17 @@
   },
   "servers": [
     {
-      "url": "https://{site}/api/index.php",
+      "url": "{scheme}://{site}/api/index.php",
       "description": "Your Joomla site",
       "variables": {
+        "scheme": {
+          "default": "https",
+          "enum": [
+            "https",
+            "http"
+          ],
+          "description": "Use http only for a local test site"
+        },
         "site": {
           "default": "example.com",
           "description": "Domain of the Joomla site, plus its folder if Joomla is installed in a folder"

@@ -64,7 +64,9 @@ section *Components without web services* in `info.description`.
 - `info.description` got the sections *Authentication* (how to get the API token, and that Joomla Update
   uses its own `X-JUpdate-Token`) and *Videos* (the YouTube playlist about Joomla web services).
 - `servers` had only the relative URL `/api/index.php`. That URL is still there, but the first server is now
-  `https://{site}/api/index.php` with a `site` variable, so "Try it out" in Swagger UI works for any Joomla site.
+  `{scheme}://{site}/api/index.php` with a `site` variable and a `scheme` variable (`https`, or `http` for a local
+  test site), so "Try it out" in Swagger UI works for any Joomla site. This was tested from Swagger UI against a
+  local test site (see [plans/api-ui-plan.md](plans/api-ui-plan.md)).
 
 ### Realistic request examples
 

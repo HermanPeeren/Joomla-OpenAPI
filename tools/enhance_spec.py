@@ -225,8 +225,10 @@ def info_and_servers(spec, own, components_without_routes):
     lines += [videos]
     spec['info']['description'] = '\n'.join(lines)
     spec['servers'] = [
-        {'url': 'https://{site}/api/index.php', 'description': 'Your Joomla site',
-         'variables': {'site': {'default': 'example.com',
+        {'url': '{scheme}://{site}/api/index.php', 'description': 'Your Joomla site',
+         'variables': {'scheme': {'default': 'https', 'enum': ['https', 'http'],
+                                  'description': 'Use http only for a local test site'},
+                       'site': {'default': 'example.com',
                                 'description': 'Domain of the Joomla site, plus its folder if Joomla is installed in a folder'}}},
         {'url': '/api/index.php', 'description': 'Relative to the site that serves this specification'},
     ]
