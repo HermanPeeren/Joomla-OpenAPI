@@ -21,53 +21,73 @@ generates an MDX page per operation and per tag, a sidebar, code samples (PHP, c
 
 ### Options
 
-| | docusaurus-openapi-docs (PR 82) | Scalar (`@scalar/docusaurus`) | Swagger UI (`swagger-ui-dist`) | Redocusaurus (Redoc) |
+| | docusaurus-openapi-docs (PR 82) | Scalar (`@scalar/api-reference`) | Swagger UI (`swagger-ui-dist`) | Redocusaurus (Redoc) |
 |---|---|---|---|---|
 | Result | A page per operation, in the Manual's own layout and sidebar | One reference page with its own sidebar | One page | One page, three panels |
-| Send requests ("Try it") | Yes | Yes, with code samples | Yes | No (Redoc CE) |
+| Send requests ("Try it") | Yes | Yes, with code samples | Yes (tested) | No (Redoc CE) |
 | Dark mode | Follows Docusaurus | Follows Docusaurus (tested) | No dark theme; needs CSS | Partly |
 | `x-tagGroups` | Yes | Yes (tested: sidebar grouped by component) | No (flat list of 48 tags) | Yes |
-| Docusaurus 3.9.2 (Manual) | v5 needs ^3.10; v4.7.1 works with ^3.5 | Yes (peer ^3.9.2) | Not a plugin, any version | Yes (peer ^3.6) |
-| Effort | High: generated files, a separate docs instance, upgrade | Low: one plugin entry | Low: one page component | Low |
+| Docusaurus 3.9.2 (Manual) | v5 needs ^3.10; v4.7.1 works with ^3.5 | Any (own page) | Any (own page) | Yes (peer ^3.6) |
+| Effort | High: generated files, a separate docs instance, upgrade | Low: one page component | Low: one page component | Low |
 | Search | Operations become searchable pages | Own search in the page | Filter by tag only | Own search |
 | Page weight | Static pages, but the big schemas are rendered per page | Loads the 6.5 MB specification in the browser | Same | Same |
 
 Stoplight Elements and RapiDoc were not tried: they offer the same as Scalar, with less Docusaurus support.
 
+**Do not use the `@scalar/docusaurus` plugin.** It was tried first. It adds a synchronous `<script>` for the
+whole Scalar bundle (about 3 MB) from jsDelivr to the `<body>` of *every* page of the Manual, and by default
+without a version, so each new Scalar release would go live unreviewed and every visitor's browser would contact
+jsDelivr. Its `cdn` option can pin a version, but not limit the script to one page. The prototype therefore
+uses its own page with the `@scalar/api-reference` npm package, bundled by Docusaurus and loaded only there.
+
 ### Prototype
 
 Branch [`docs/6.2-api-reference-ui`](https://github.com/HermanPeeren/Manual-Joomla/tree/docs/6.2-api-reference-ui)
-of HermanPeeren/Manual-Joomla (on top of `docs/6.2-openapi-enhancements`) has both lightweight viewers:
+of HermanPeeren/Manual-Joomla (on top of `docs/6.2-openapi-enhancements`) has two pages; `docusaurus.config.js`
+is not changed:
 
-* `/web-services-api/reference/`: Scalar, a plugin entry in `docusaurus.config.js`. Options:
-  `hideModels` (the 633 schemas would flood the sidebar), `defaultOpenFirstTag: false`,
-  `authentication.preferredSecurityScheme: 'BearerAuth'`, and `showDeveloperTools: 'never'` plus
-  `agent: {disabled: true}`, which remove Scalar's commercial toolbar (Configure, Share, Generate SDK, Deploy
-  API) and its "Ask AI" button.
+* `/web-services-api/reference/`: Scalar, `src/pages/web-services-api/reference.js`. It loads
+  `@scalar/api-reference` with a dynamic `import()`, so its JavaScript is only loaded on this page (see below
+  for its CSS). Options: `hideModels` (the 633 schemas would flood the sidebar),
+  `defaultOpenFirstTag: false`, `authentication.preferredSecurityScheme: 'BearerAuth'`,
+  `showDeveloperTools: 'never'` and `agent: {disabled: true}` (remove Scalar's commercial toolbar and its
+  "Ask AI" button), and `forceDarkModeState` from Docusaurus' `useColorMode()`, updated with
+  `updateConfiguration()` when the reader switches the theme. One CSS rule hides Scalar's "Generate SDKs & MCP"
+  advertisement, which has no option.
 * `/web-services-api/swagger-ui/`: Swagger UI, `src/pages/web-services-api/swagger-ui.js`. It uses the prebuilt
-  `swagger-ui-dist` bundle: `swagger-ui-react` does not compile with Docusaurus' webpack 5 without Node polyfills.
-  A small CSS block in `src/css/custom.css` gives it a light panel in dark mode and puts its dialogs above the
-  navbar.
+  `swagger-ui-dist` bundle, also with a dynamic `import()`: `swagger-ui-react` does not compile with Docusaurus'
+  webpack 5 without Node polyfills. A small CSS block in `src/css/custom.css` gives it a light panel in dark mode
+  and puts its dialogs above the navbar.
 * `docs/web-services-api/openapi.md` links to both and explains how to try requests.
+* Dependencies, pinned to versions that are at least two weeks old: `@scalar/api-reference@1.74.0`,
+  `swagger-ui-dist@5.33.2`.
+* `npm run build` of the whole Manual succeeds (including the broken-link check).
 
 Tested in the browser against the local Joomla 6.2.0 test site:
 
-* Server variables `scheme` = `http` and `site` = `localhost/Joomla-OpenAPI/joomla`, Bearer token, "Try it out" on
-  `GET /v1/media/files/{path}` with `local-images:/joomla_black.png`: 200 with the file.
+* Swagger UI: server variables `scheme` = `http` and `site` = `localhost/Joomla-OpenAPI/joomla`, Bearer token,
+  "Try it out" on `GET /v1/media/files/{path}` with `local-images:/joomla_black.png`: 200 with the file.
 * That only works because of a `requestInterceptor` in the Swagger UI page that undoes the `%2F` encoding of
   media paths: Swagger UI encodes path parameters, and Apache (default `AllowEncodedSlashes Off`) answers a `%2F`
-  in the path with its own 404. Scalar needs the same check; see "Still to do".
+  in the path with its own 404. Scalar's code inserts path values without encoding (`replacePathVariables` in
+  `@scalar/helpers`), so it should not need this; not yet confirmed in its UI.
 * CORS: the Manual runs on another origin than the site. With *Enable CORS* off (the default), the preflight
   `OPTIONS` request gets HTTP 500. With CORS on, the preflight gets 204 with
   `Access-Control-Allow-Methods` = the methods of that route and `Access-Control-Allow-Headers` including
   `Authorization`.
 * Dark mode: Scalar follows the Manual's theme; Swagger UI needed the CSS mentioned above.
+* Other pages of the Manual load no Scalar or Swagger UI JavaScript.
+* CSS: Docusaurus merges all CSS into one stylesheet for the whole site, even CSS that a page imports
+  dynamically. In the production build, Swagger UI adds about 169 KB and Scalar about 138 KB to that 493 KB
+  stylesheet, which every page loads. Their rules are scoped (`.swagger-ui …`, Scalar's own classes); no rule
+  was found that changes the Manual's own pages. The minimizer warns about one modern CSS expression in Scalar's
+  CSS (`(50 - l) * infinity`), without failing the build.
 
 ### Recommendation
 
 1. **Now (6.2 docs):** Scalar as *the* API reference page of the Manual, linked from the OpenAPI Reference page
-   and from the navbar or the Web Services sidebar. It is one plugin entry, needs no generated files, follows the
-   Manual's look and dark mode, shows the component grouping and has "Try it" with code samples. Keep the
+   and from the navbar or the Web Services sidebar. It is one page component, needs no generated files, follows
+   the Manual's look and dark mode, shows the component grouping and has "Try it" with code samples. Keep the
    Swagger UI page only if the docs team wants a familiar "Swagger" view; otherwise drop it, so there is only one
    viewer to maintain.
 2. **Later:** per-operation pages with docusaurus-openapi-docs, if the docs team wants operations to show up in
@@ -80,21 +100,16 @@ Tested in the browser against the local Joomla 6.2.0 test site:
    `joomla-6.3.0.json`, …). Scalar's `sources` option shows several specifications with a selector, so one page
    can cover all supported versions.
 
-**Scalar loads its code from a CDN.** `@scalar/docusaurus` itself is small: in the browser it loads
-`@scalar/api-reference` from jsDelivr, and *without a version*, so every new Scalar release goes live in the
-Manual unreviewed, and visitors' browsers contact jsDelivr. The plugin's `cdn` option fixes this. The
-prototype pins an exact version (`https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.74.0`). For the real
-Manual, self-host it: add `@scalar/api-reference` as a dependency, copy its standalone bundle into the build
-(for example with a small plugin or a `postinstall` step into a static folder) and point `cdn` to that file.
-Swagger UI has no such issue: `swagger-ui-dist` is bundled by webpack.
-
 ### Still to do
 
-* Test "Try it" in Scalar for media paths (encoded slashes) and, if needed, use its `customFetch` option for the
-  same correction as the Swagger UI interceptor.
+* Keep the viewers' CSS out of the site-wide stylesheet: copy `swagger-ui.css` and Scalar's `style.css` into
+  a static folder at build time (a small local plugin or an npm script) and add a `<link>` on the viewer page
+  only. Dropping one of the two viewers already halves the extra CSS.
+
+* Confirm "Test Request" in Scalar with a media path (slashes) against a site.
 * Decide with Sergey and the docs team which viewer(s) to use, before a pull request.
-* Scalar's sidebar starts just below the Manual's navbar but its search box is partly hidden: a small CSS fix.
-* Pin dependency versions that are at least two weeks old before proposing it (the prototype uses the latest).
+* At widths around 1000 px the Manual's navbar items wrap and spill over the top of the page (an existing
+  Manual issue), covering the top of Scalar's sidebar.
 * Consider making the specification smaller: the form, parameter and menu-view catalogues (225 schemas that no
   operation uses) could move to a separate file.
 
