@@ -85,20 +85,21 @@ Tested in the browser against the local Joomla 6.2.0 test site:
 
 ### Recommendation
 
-1. **Now (6.2 docs):** Scalar as *the* API reference page of the Manual, linked from the OpenAPI Reference page
-   and from the navbar or the Web Services sidebar. It is one page component, needs no generated files, follows
-   the Manual's look and dark mode, shows the component grouping and has "Try it" with code samples. Keep the
-   Swagger UI page only if the docs team wants a familiar "Swagger" view; otherwise drop it, so there is only one
-   viewer to maintain.
-2. **Later:** per-operation pages with docusaurus-openapi-docs, if the docs team wants operations to show up in
-   the Manual's search and sidebar. Do it in a separate docs plugin instance (for example `path: 'api'`), not in
-   the versioned `docs/` folder and not with `docItemComponent` on the main instance, and generate the MDX at
-   build time instead of committing it. Version 5 needs Docusaurus 3.10, so upgrade the Manual first (a minor
-   upgrade). Test the build time and page size with the 6.5 MB specification: the Global Configuration and
-   component options schemas are large.
+Update 2026-10-30: docusaurus-openapi-docs **4.7.1** works with the Manual's Docusaurus 3.9 (no upgrade needed).
+It is now in the demo next to Scalar, Stoplight Elements and Swagger UI:
+https://hermanpeeren.github.io/Manual-Joomla/ (branch `docs/6.2-api-reference-openapi-docs` of
+HermanPeeren/Manual-Joomla).
+
+1. **Main viewer: docusaurus-openapi-docs** (the concept of joomla/Manual PR 82). Pages per operation in the
+   Manual's own layout and sidebar, grouped by component (`groupPathsBy: 'tagGroup'`), with code samples and
+   "send request". Set up as a separate docs instance (`api-reference/`, route `/api-reference/`), generated with
+   `npx docusaurus gen-api-docs all` before the build and not committed, with `docItemComponent` only on that
+   instance. Needs `path-browserify` for the code generators. Cost: the demo build (current version only) takes
+   about 6 instead of 3 minutes and is 101 instead of 69 MB.
+2. **Optional single-page overview: Scalar**, as its own page (not the `@scalar/docusaurus` plugin). Keep at most
+   one extra viewer; Stoplight Elements needs an iframe and Swagger UI needs extra fixes.
 3. **Versions:** keep one specification per Joomla version in `static/openapi/` (`joomla-6.2.0.json`,
-   `joomla-6.3.0.json`, …). Scalar's `sources` option shows several specifications with a selector, so one page
-   can cover all supported versions.
+   `joomla-6.3.0.json`, …); docusaurus-openapi-docs has a `versions` option for a version selector.
 
 ### Still to do
 
