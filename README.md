@@ -6,6 +6,21 @@ A complete [OpenAPI](https://learn.openapis.org/) specification of Joomla's web 
 * `joomla-6.2.0.json`: OpenAPI 3.1 specification of the Joomla 6.2.0 core web services API. This is the most complete specification in this repository. See [Origin of joomla-6.2.0.json](#origin-of-joomla-620json).
 * `joomla-api.json`: the original, hand-made specification of this repository (Joomla 4+). It is less complete; its readable summaries, tags and descriptions are being merged into `joomla-6.2.0.json`.
 * `CHANGES-joomla-6.2.0.md`: what has been changed in `joomla-6.2.0.json` compared to the original file.
+* `tools/enhance_spec.py`: makes `joomla-6.2.0.json` from the original file (see CHANGES-joomla-6.2.0.md).
+* `tools/capture_responses.py` and `tools/captured-responses.json`: responses of a Joomla 6.2.0 test site, used as examples.
+* `redocly.yaml`: configuration for linting with `npx @redocly/cli lint joomla-6.2.0.json`.
+
+## Local test site
+
+`tools/capture_responses.py` needs a Joomla test site. Install the latest stable Joomla release in the
+git-ignored `/joomla` folder, create an API token for a Super User and save it in a file outside the
+repository. Then:
+
+```bash
+python tools/capture_responses.py joomla-6.2.0.json http://localhost/Joomla-OpenAPI/joomla/api/index.php <token file> tools/captured-responses.json
+```
+
+Use a fresh site: the script creates records, so a second run on the same site gives other results.
 
 ## Origin of joomla-6.2.0.json
 

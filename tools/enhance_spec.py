@@ -13,6 +13,7 @@ import argparse
 import collections
 import copy
 import json
+import os
 import re
 import sys
 
@@ -77,7 +78,8 @@ SPECIAL = {
         'Contacts Form', 'Send Contact Form Message',
         'Send a message to the Contact with a specific ID through its contact form.'),
     ('post', '/v1/languages'): (
-        'Languages', 'Install Language', 'Install a language package. This task is registered but not implemented.'),
+        'Languages', 'Install Language (not implemented)',
+        'Not implemented in Joomla 6.2.0: on a test site this request returned HTTP 500 and installed nothing.'),
     ('get', '/v1/joomlaupdate/healthcheck'): (
         'Joomla Update', 'Get Update Health Check', 'Check whether the site is ready for an automatic core update.'),
     ('get', '/v1/joomlaupdate/getUpdate'): (
@@ -209,9 +211,13 @@ def info_and_servers(spec, own, components_without_routes):
     videos = own_description[own_description.index('## Videos'):].strip()
     lines = [spec['info']['description'], '',
              '## Authentication', '',
-             'Authentication is done using a Joomla API Token in the `X-Joomla-Token` header. To get the token, '
-             'go to the user profile in your Joomla installation and activate and copy the API key. '
-             'The Joomla Update endpoints use the separate `X-JUpdate-Token`.', '']
+             'Authentication is done using a Joomla API Token, sent as `Authorization: Bearer <token>` or in the '
+             '`X-Joomla-Token` header. To get the token, go to the user profile in your Joomla installation and '
+             'activate and copy the API key. Basic authentication with username and password only works when '
+             'its plugin is enabled. The Joomla Update endpoints use the separate `X-JUpdate-Token`.', '',
+             '## Response schemas', '',
+             'Response schemas and examples are derived from the Joomla source code; they are not captured from '
+             'a site, unless the example says so.', '']
     if components_without_routes:
         lines += ['## Components without web services', '']
         lines += [f'* {description}' for _, description in components_without_routes]
@@ -219,11 +225,19 @@ def info_and_servers(spec, own, components_without_routes):
     lines += [videos]
     spec['info']['description'] = '\n'.join(lines)
     spec['servers'] = [
-        {'url': 'https://{site}/api/index.php', 'description': 'Your Joomla site',
-         'variables': {'site': {'default': 'example.com',
+        {'url': '{scheme}://{site}/api/index.php', 'description': 'Your Joomla site',
+         'variables': {'scheme': {'default': 'https', 'enum': ['https', 'http'],
+                                  'description': 'Use http only for a local test site'},
+                       'site': {'default': 'example.com',
                                 'description': 'Domain of the Joomla site, plus its folder if Joomla is installed in a folder'}}},
         {'url': '/api/index.php', 'description': 'Relative to the site that serves this specification'},
     ]
+
+
+def schema_validator(schema, registry):
+    """Validator for a schema of the specification; its local references point into the specification."""
+    schema = json.loads(json.dumps(schema).replace('"#/components/', '"urn:spec#/components/'))
+    return Draft202012Validator(schema, registry=registry)
 
 
 def own_examples(spec, own, report):
@@ -241,7 +255,7 @@ def own_examples(spec, own, report):
         if not values:
             continue
         schema = media.get('schema', {})
-        validator = Draft202012Validator({'$ref': 'urn:spec' + schema['$ref']} if '$ref' in schema else schema, registry=registry)
+        validator = schema_validator(schema, registry)
         valid = [value for value in values if validator.is_valid(value)]
         report['own examples rejected'] += len(values) - len(valid)
         for value in values:
@@ -259,22 +273,177 @@ def own_examples(spec, own, report):
         report['own examples added'] += len(valid)
 
 
-def fix_errors(spec, report):
-    """Errors in the original: an example that does not match its ErrorDocument schema."""
+AUTHENTICATION = {
+    'BearerAuth': {
+        'type': 'http', 'scheme': 'bearer',
+        'description': 'Joomla API token of a user, sent as `Authorization: Bearer <token>`. Users get their token '
+                       'on the Joomla API Token tab of their profile. The plugins "API Authentication - Web Services '
+                       'Joomla Token" and "User - Joomla API Token" must be enabled.'},
+    'JoomlaToken': {
+        'type': 'apiKey', 'in': 'header', 'name': 'X-Joomla-Token',
+        'description': 'The same API token in the `X-Joomla-Token` header. Joomla reads this header only when '
+                       'there is no `Authorization: Bearer` header.'},
+    'BasicAuth': {
+        'type': 'http', 'scheme': 'basic',
+        'description': 'Username and password of a user. Only works when the plugin "API Authentication - Web '
+                       'Services Basic Auth" is enabled, which it is not by default.'},
+}
+MEDIA_PATH = ('Adapter ID, a colon and the path from the root of the adapter, for example '
+              '`local-images:/banners/osmbanner1.png`. Get the adapter IDs from `/v1/media/adapters`. ')
+MEDIA_SLASHES = ('Do not URL-encode the slashes: with the default Apache setting `AllowEncodedSlashes Off`, '
+                 'a `%2F` in the URL path gives a 404 from the web server before Joomla is reached. ')
+MEDIA_QUERY = {
+    'url': 'Add the public URL of each file as `url`.',
+    'content': 'Add the Base64-encoded content of the file as `content`.',
+    'temp': 'Passed on to the media adapter; Joomla core and its local adapter do not use it.',
+}
+
+
+def api_details(spec, report):
+    """Authentication, the Joomla Update token, the success responses and the media paths."""
+    schemes = spec['components']['securitySchemes']
+    update_token = schemes.pop('JUpdateToken')
+    update_token['description'] = ('Update token of the Joomla Automated Updates service, set in the options of '
+                                   'Joomla Update. Only used by the `/v1/joomlaupdate` endpoints.')
+    schemes.clear()
+    schemes.update(AUTHENTICATION, JUpdateToken=update_token)
+    spec['security'] = [{name: []} for name in AUTHENTICATION]
+
     for path, method, operation in operations(spec):
-        for response in operation.get('responses', {}).values():
-            for media in response.get('content', {}).values():
-                errors = media.get('example', {}).get('errors') if isinstance(media.get('example'), dict) else None
-                if isinstance(errors, dict):
-                    media['example']['errors'] = [errors]
-                    report['fixed'].append(f'{method.upper()} {path}: "errors" in the example is now an array')
+        parameters = operation.get('parameters', [])
+        if any(p.get('name') == 'X-JUpdate-Token' and p.get('in') == 'header' for p in parameters):
+            operation['parameters'] = [p for p in parameters if p.get('name') != 'X-JUpdate-Token']
+            report['duplicate X-JUpdate-Token parameters removed'] += 1
+        success = operation['responses'].get('200')
+        if success and success.get('description', '').startswith('Synthetic response shape'):
+            success['description'] = success_description(operation['summary'])
+            report['200 descriptions'] += 1
+
+    media(spec, report)
+
+
+def success_description(summary):
+    verb, _, rest = summary.partition(' ')
+    return {'List': f'A list of {rest}.', 'Get': f'The {rest}.', 'Add': f'The created {rest}.',
+            'Update': f'The updated {rest}.'}.get(verb, 'Successful response.')
+
+
+def media(spec, report):
+    paths = spec['paths']
+    files, folder = paths['/v1/media/files/{path}'], paths.pop('/v1/media/files/{path}/')
+    for method, operation in files.items():
+        for parameter in operation.get('parameters', []):
+            if parameter.get('name') == 'path':
+                parameter['schema'] = {'type': 'string', 'pattern': '^[^:/]+:/.*$'}
+                parameter['description'] = MEDIA_PATH + ('End the path with `/` to list a folder. ' if method == 'get' else '') + MEDIA_SLASHES
+                parameter['example'] = 'local-images:/joomla_black.png'
+
+    # GET .../{path}/ only differs from GET .../{path} by the slash at the end of the value: one operation.
+    item, listing = files['get'], folder['get']
+    names = {p.get('name') for p in item['parameters']}
+    item['parameters'] += [p for p in listing.get('parameters', []) if p.get('name') not in names]
+    item['summary'] = 'Get Media File or List Media Folder'
+    item['description'] = ('Get the media file at the given path. When the path ends with `/`, list the items in '
+                           'that folder instead.\n\n' + item['description'].split('\n\n', 1)[-1])
+    item['x-controller-task'] = item['x-controller-task'] + '; ' + listing['x-controller-task'] + ' when the path ends with /'
+    item['x-source'] = sorted(set(item['x-source']) | set(listing['x-source']))
+    item_media = item['responses']['200']['content']['application/vnd.api+json']
+    list_media = listing['responses']['200']['content']['application/vnd.api+json']
+    item_media['schema'] = {'oneOf': [item_media['schema'], list_media['schema']]}
+    item_media['examples'] = {'file': {'summary': 'A file', 'value': item_media.pop('example')},
+                              'folder': {'summary': 'A folder (path ending with /)', 'value': list_media['example']}}
+    item['responses']['200']['description'] = 'The Media File, or the items in the Media Folder.'
+    report['media folder path merged'] += 1
+
+    for operation in (paths['/v1/media/files']['get'], item):
+        for parameter in operation['parameters']:
+            if parameter.get('name') in MEDIA_QUERY:
+                parameter['description'] = MEDIA_QUERY[parameter['name']]
+    collection = paths['/v1/media/files']['get']
+    collection['parameters'].insert(0, {
+        'name': 'path', 'in': 'query', 'allowReserved': True, 'schema': {'type': 'string', 'pattern': '^[^:/]+:/.*$'},
+        'example': 'local-images:/banners/',
+        'description': MEDIA_PATH + 'A folder lists its items, a file gives a list with only that file. '
+                       'Without `path` the list is empty. Unlike the path parameter of `/v1/media/files/{path}`, '
+                       'this one also works when the slashes are URL-encoded.'})
+    report['media path query parameter added'] += 1
+
+
+CAPTURED_ITEMS = 3
+JSON_TYPES = ((type(None), 'null'), (bool, 'boolean'), (int, 'integer'), (float, 'number'), (str, 'string'))
+
+
+def json_type(value):
+    return next((name for kind, name in JSON_TYPES if isinstance(value, kind)), None)
+
+
+def first_unfixable_error(schema, registry, body, key, report):
+    """Correct the response schema where the captured response shows a difference that is safe to correct.
+
+    Safe corrections: the `id` that Joomla adds to the attributes of a resource, and a missing scalar type
+    (null, boolean, integer, number or string) of a property. The schemas are changed in place. Returns the
+    first error that is not corrected, or None when the response is valid.
+    """
+    for _ in range(25):
+        errors = list(schema_validator(schema, registry).iter_errors(body))
+        if not errors:
+            return None
+        fixed = False
+        for error in errors:
+            target, instance, where = error.schema, error.instance, '/'.join(str(p) for p in error.absolute_path)
+            if error.validator in ('additionalProperties', 'maxProperties') and isinstance(instance, dict) \
+                    and 'id' in instance and 'id' not in target.get('properties', {}):
+                target.setdefault('properties', {})['id'] = {'type': json_type(instance['id'])}
+                if 'maxProperties' in target:
+                    target['maxProperties'] += 1
+                report['schema corrections'].append(f'{key}: {where}: `id` added to the attributes')
+                fixed = True
+            elif error.validator == 'type' and json_type(instance) and not isinstance(instance, (dict, list)):
+                types = target['type'] if isinstance(target['type'], list) else [target['type']]
+                if json_type(instance) not in types:
+                    target['type'] = types + [json_type(instance)]
+                    report['schema corrections'].append(
+                        f'{key}: {where}: type {json_type(instance)} added (value {json.dumps(instance)})')
+                    fixed = True
+        if not fixed:
+            return errors[0]
+    return errors[0]
+
+
+def captured_examples(spec, captured, report):
+    """Replace the derived response examples by responses captured from a test site, where they match the schema."""
+    registry = Registry().with_resource('urn:spec', Resource.from_contents(spec, default_specification=DRAFT202012))
+    for key, result in captured.items():
+        method, path = key.split(' ', 1)
+        operation = spec['paths'].get(path, {}).get(method.lower())
+        response = operation and operation['responses'].get(str(result['status']))
+        if not response or '$ref' in response or not 200 <= result['status'] < 300:
+            continue
+        media = response.get('content', {}).get('application/vnd.api+json')
+        if not media:
+            continue
+        body, summary = copy.deepcopy(result['body']), 'Response of a Joomla 6.2.0 test site'
+        if isinstance(body.get('data'), list) and len(body['data']) > CAPTURED_ITEMS:
+            body['data'] = body['data'][:CAPTURED_ITEMS]
+            summary += f', shortened to the first {CAPTURED_ITEMS} items'
+        error = first_unfixable_error(media['schema'], registry, body, key, report)
+        if error:
+            where = '/'.join(str(part) for part in error.absolute_path)
+            report['captured responses not matching the schema'].append(f'{key}: {where}: {error.message[:150]}')
+            continue
+        example = {'summary': summary, 'value': body}
+        if 'examples' in media:
+            media['examples']['file' if path == '/v1/media/files/{path}' else 'captured'] = example
+        else:
+            media.pop('example', None)
+            media['examples'] = {'captured': example}
+        report['captured responses added'] += 1
 
 
 RESPONSE_NAMES = {'204': 'Deleted', '400': 'BadRequest', '401': 'Unauthorized', '403': 'Forbidden',
                   '404': 'NotFound', '406': 'NotAcceptable', '409': 'Conflict', '500': 'InternalServerError'}
 PARAMETER_NAMES = {'page[offset]': 'PageOffset', 'page[limit]': 'PageLimit', 'id': 'Id',
-                   'filter[search]': 'FilterSearch', 'filter[state]': 'FilterState', 'lang_code': 'LangCode',
-                   'X-JUpdate-Token': 'JUpdateToken'}
+                   'filter[search]': 'FilterSearch', 'filter[state]': 'FilterState', 'lang_code': 'LangCode'}
 
 
 def shared_components(spec, report, minimum=5):
@@ -341,22 +510,29 @@ def main():
     parser.add_argument('original')
     parser.add_argument('own')
     parser.add_argument('output')
+    parser.add_argument('--captured', default='tools/captured-responses.json',
+                        help='responses captured with capture_responses.py (default: %(default)s)')
     parser.add_argument('--no-components', action='store_true', help='do not move repeated parts to components')
     args = parser.parse_args()
 
     spec = json.load(open(args.original, encoding='utf-8'))
     own = json.load(open(args.own, encoding='utf-8'))
     original = copy.deepcopy(spec)
-    report = collections.defaultdict(int, rejected=[], fixed=[])
+    report = collections.defaultdict(int, rejected=[])
+    report['captured responses not matching the schema'] = []
+    report['schema corrections'] = []
 
-    fix_errors(spec, report)
     components_without_routes = readable_operations(spec, own, report)
     info_and_servers(spec, own, components_without_routes)
+    api_details(spec, report)
     own_examples(spec, own, report)
+    if os.path.exists(args.captured):
+        captured_examples(spec, json.load(open(args.captured, encoding='utf-8')), report)
     if not args.no_components:
         shared_components(spec, report)
 
-    assert len(list(operations(spec))) == len(list(operations(original)))
+    # Only GET /v1/media/files/{path}/ is merged into GET /v1/media/files/{path}.
+    assert len(list(operations(spec))) == len(list(operations(original))) - report['media folder path merged']
     order = ['openapi', 'info', 'servers', 'security', 'tags', 'x-tagGroups', 'paths', 'components']
     spec = {key: spec[key] for key in order + [key for key in spec if key not in order] if key in spec}
     with open(args.output, 'w', encoding='utf-8', newline='\n') as file:
