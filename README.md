@@ -7,6 +7,7 @@ A complete [OpenAPI](https://learn.openapis.org/) specification of Joomla's web 
 * `joomla-api.json`: the original, hand-made specification of this repository (Joomla 4+). It is less complete; its readable summaries, tags and descriptions are being merged into `joomla-6.2.0.json`.
 * `CHANGES-joomla-6.2.0.md`: what has been changed in `joomla-6.2.0.json` compared to the original file.
 * `tools/enhance_spec.py`: makes `joomla-6.2.0.json` from the original file (see CHANGES-joomla-6.2.0.md).
+* `tools/fix_required_fields.py`: the required fields and minimal examples of create requests, tested on a fresh site.
 * `tools/capture_responses.py` and `tools/captured-responses.json`: responses of a Joomla 6.2.0 test site, used as examples.
 * `redocly.yaml`: configuration for linting with `npx @redocly/cli lint joomla-6.2.0.json`.
 
@@ -33,7 +34,9 @@ Use a fresh site: the script creates records, so a second run on the same site g
 
 It is derived from the Joomla 6.2.0 source code: routes from the web services plugins, request bodies from the form XML files and response shapes from the API views. The `x-source` property of each operation lists the source files it was derived from.
 
-Changes made in this repository are listed in [CHANGES-joomla-6.2.0.md](CHANGES-joomla-6.2.0.md).
+Changes made in this repository are listed in [CHANGES-joomla-6.2.0.md](CHANGES-joomla-6.2.0.md). Sergey took
+them over into [joomla/Manual#724](https://github.com/joomla/Manual/pull/724); the current file is that PR's
+version plus the fixes proposed in [sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1).
 
 ## Work in progress
 

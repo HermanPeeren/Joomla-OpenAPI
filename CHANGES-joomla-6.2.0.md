@@ -9,8 +9,19 @@ This file lists what has been changed in this repository:
   schemas were corrected where a real response showed they were wrong;
 * parts that were repeated many times were moved to `components`.
 
-All changes are made by [`tools/enhance_spec.py`](tools/enhance_spec.py), so they can be applied again
-to a new version of the original file. The captured responses are in
+Sergey took these changes over into [joomla/Manual#724](https://github.com/joomla/Manual/pull/724) on
+2026-10-30. The current `joomla-6.2.0.json` is the file of that PR plus the fixes proposed in
+[sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1). It was made
+in three steps:
+
+1. [`tools/enhance_spec.py`](tools/enhance_spec.py) on the original file (commit `aab8d40`): everything in this
+   file up to [Create requests tested on a fresh site](#create-requests-tested-on-a-fresh-site);
+2. Sergey's commit [`4fe2bf0`](https://github.com/sergeytolkachyov/Manual-Joomla-org/commit/4fe2bf0): the exact
+   Bearer / `X-Joomla-Token` fallback, and `size` of a media folder is an empty string;
+3. [`tools/fix_required_fields.py`](tools/fix_required_fields.py): see
+   [Create requests tested on a fresh site](#create-requests-tested-on-a-fresh-site).
+
+Step 1 can be applied again to a new version of the original file. The captured responses are in
 [`tools/captured-responses.json`](tools/captured-responses.json), made with
 [`tools/capture_responses.py`](tools/capture_responses.py) (see [Captured responses](#captured-responses)):
 
@@ -19,7 +30,7 @@ pip install jsonschema
 python tools/enhance_spec.py <original joomla-6.2.0.json> joomla-api.json joomla-6.2.0.json
 ```
 
-Not changed: the paths (except the merged media folder path), the operations, their `operationId`s, the
+Not changed by step 1: the paths (except the merged media folder path), the operations, their `operationId`s, the
 request schemas, and the `x-source`, `x-support`, `x-controller-task` and `x-route-defaults` properties. The
 original description of each operation is kept; a first sentence was added in front of it. The result validates
 as OpenAPI 3.1 (checked with `openapi-spec-validator`) and gives no errors with Redocly CLI (see
@@ -243,10 +254,59 @@ site. Most show a constraint that the request schema does not describe:
 | POST /v1/users | 400 | You can't save a user account without selecting at least one user group. |
 
 So in practice `description` (fields and field groups) and `params` (modules, newsfeeds, template styles) are
-required on MySQL with strict mode, and users need `groups`. These are candidates for `required` in the request
-schemas, and for better minimal examples.
+required on MySQL with strict mode, and users need `groups`. This was worked out in
+[Create requests tested on a fresh site](#create-requests-tested-on-a-fresh-site).
 
 A GET of a message or newsfeed that does not exist gives 500 instead of 404.
+
+## Create requests tested on a fresh site
+
+Made by [`tools/fix_required_fields.py`](tools/fix_required_fields.py), proposed to Sergey in
+[sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1). On a fresh
+Joomla 6.2.0 site, each field was left out of a working create request, one at a time; a field is required when
+the request then fails. All new minimal examples were sent to a freshly reset site and succeed (23 of 23), and all
+captured responses are valid against their schema.
+
+### Context and client_id are not applied when creating
+
+The route's context or client is used for reading, but not when saving a new record:
+
+* fields and field groups without `context` in the body are saved *without* a context, and the request returns
+  404. Field group request schemas had no `context` property; it is added;
+* `POST /v1/modules/administrator` without `client_id` creates a **site** module (and returns 404);
+* `POST /v1/menus/administrator` without `client_id` returns **200**, but creates a **site** menu.
+
+The guides `fields.md`, `modules.md` and `menus.md` in the Manual were corrected in the same PR.
+
+### Required fields added
+
+| Create request | Added to `required` | Reason |
+|---|---|---|
+| fields (6 contexts) | `context`, `description`, `params` | saved without context and 404; database |
+| field groups (6 contexts) | `context`, `description` | the same |
+| modules (site, administrator) | `language`, `params` (+ `client_id` for administrator) | database; "Invalid field: Layout" |
+| menus (administrator) | `client_id` | creates a site menu otherwise |
+| menu items (site) | `alias`, `link` | database (`path`, `link`) |
+| banner clients | `extrainfo` | database |
+| contacts | `language` | database |
+| newsfeeds | `description`, `images`, `metadata`, `metadesc`, `params` | database |
+| template styles | `params` | database |
+| users | `groups` | "You can't save a user account without selecting at least one user group." |
+| user groups | `parent_id` | "There has to be at least one root usergroup" |
+
+"Database" means a `TEXT NOT NULL` column without default; Joomla's database driver uses strict mode. A `params`
+object needs at least one key: an empty object is not saved. A field name (made from the title) must be unique
+over all contexts. The minimal examples of these requests are replaced by bodies that succeed.
+
+### Response schemas corrected
+
+* menu items: `params` only allowed an empty object; it can now be any object;
+* template style lists: `assigned` is the number of menu items the style is assigned to (an integer).
+
+### Still failing on a fresh site
+
+`POST /v1/languages/content`, `/v1/media/files`, `/v1/menus/administrator/items`, `/v1/messages`,
+`/v1/redirects` and `/v1/tags` were not part of this work; see the table above.
 
 ### The two forms of `errors`
 
