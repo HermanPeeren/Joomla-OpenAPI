@@ -2,20 +2,25 @@
 
 Plan for getting the Web Services API completely and clearly documented in the Joomla Manual, starting from
 [joomla/Manual#724](https://github.com/joomla/Manual/pull/724). It replaces the four steps of the comment on that
-PR. Status: 2026-11-11. The viewer comparison is in [api-ui-plan.md](api-ui-plan.md).
+PR. Status: 2026-11-11 (code-sample tabs prototyped the same day). The viewer comparison is in [api-ui-plan.md](api-ui-plan.md).
 
 ## Where we are
 
 * **PR 724** (Sergey Tolkachyov) is open, mergeable and passing. It includes the required-fields fixes of
   [sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1), merged on
   2026-11-03. Its preview is at <https://docs-6-2-web-services-api.manual-bku.pages.dev/docs/next/web-services-api/>;
-  the specification served there is identical to `joomla-6.2.0.json` in this repository.
+  the specification served there was identical to `joomla-6.2.0.json` in this repository until 2026-11-11.
+* **[sergeytolkachyov/Manual-Joomla-org#2](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/2)** (open):
+  two more create requests that fail on a fresh site, found while testing the code samples. Articles need
+  `language`; tags need `parent_id`, `description` and `language`. These columns have had no database default
+  since Joomla 3, and Joomla 4 made MySQL strict, so this is an old mistake in the specification, not a change in
+  Joomla. Already in `joomla-6.2.0.json` of this repository.
 * **PR 724 changes only the Web Services API section**: `docs/web-services-api/` (a rewritten `index.md`, a new
   `openapi.md`, 22 pages under `components/`, a short addition to `json-response-format/index.md`) and
   `static/openapi/joomla-6.2.0.json`. It does not touch General Concepts › Web Services.
 * **Demo**: <https://hermanpeeren.github.io/Manual-Joomla/>, with docusaurus-openapi-docs 4.7.1 (the concept of
-  Harald's [#82](https://github.com/joomla/Manual/pull/82)), Scalar, Swagger UI and Stoplight Elements, and the
-  reworked General Concepts page.
+  Harald's [#82](https://github.com/joomla/Manual/pull/82)) with the code-sample tabs described below, Scalar,
+  Swagger UI and Stoplight Elements, and the reworked General Concepts page.
 * **[joomla-projects/API-Endpoints](https://github.com/joomla-projects/API-Endpoints)** is empty (LICENSE and a
   README with only a title). Licence GPL-3.0. Herman has read access only.
 
@@ -72,18 +77,48 @@ steps below remove. Merging is up to the Manual maintainers; Sergey and Herman c
 
 ### Can docusaurus-openapi-docs show the Joomla way of calling the API?
 
-Yes. The theme (4.7.1, checked in its source: `ApiExplorer/CodeSnippets/languages.js`) reads the `x-codeSamples`
-extension of each operation. A sample with `lang: "PHP"` and `label: "Joomla HttpFactory"` appears as an extra
-tab in the PHP language, next to (or instead of) the generated variants (cURL, Guzzle, pecl_http, HTTP_Request2).
-The same works for `lang: "JavaScript"` with a `Joomla.request` sample.
+Yes; it is prototyped in the demo, for example on
+[Add Article](https://hermanpeeren.github.io/Manual-Joomla/api-reference/com-content-post-v-1-content-articles/).
 
-* The samples are generated for all 235 operations by a script, from the path, method, parameters and the
-  `minimal` request example; they are not written by hand.
-* `x-codeSamples` are static text: unlike the generated variants, they do not change with the values entered in
-  the "Send API request" form. If that matters later, the theme's `CodeSnippets` component can be swizzled to
-  generate the HttpFactory code from the live request. Start with static samples.
-* `languageTabs` in `docusaurus.config.js` sets which languages and variants are shown. Proposal: curl, PHP (only
-  the Joomla HttpFactory sample), JavaScript (fetch and `Joomla.request`), Python.
+**Tabs.** The code panel of each operation has the languages PHP, JavaScript, curl and Python, in that order. Under
+each language there is one horizontal row of tabs, as in #82:
+
+| Language | Tabs |
+|---|---|
+| PHP | Joomla HttpFactory · WordPress · Drupal · TYPO3 · cURL |
+| JavaScript | `fetch()` · `Joomla.request` |
+| curl | curl |
+| Python | Requests |
+
+* **Samples** (Joomla HttpFactory, WordPress, Drupal, TYPO3, `Joomla.request`) are `x-codeSamples` of the
+  specification. `scripts/openapi-code-samples.js` generates them for all 235 operations, from the path, method,
+  parameters and the `minimal` request example, into a build copy of the specification; the specification itself
+  is not changed. Each platform uses its own HTTP client: `Joomla\Http\HttpFactory`, `wp_remote_request()`,
+  `\Drupal::httpClient()` and TYPO3's `RequestFactory`.
+* **Generated variants** (PHP cURL, `fetch()`, curl, Python Requests) come from postman-code-generators. They
+  follow the values entered in the "Send API request" form; the samples are static text with example values.
+* **Plain PHP cURL** is for PHP code outside these platforms.
+
+**Theme change.** The theme of docusaurus-openapi-docs shows `x-codeSamples` in a separate row above the generated
+variants, two code blocks under each other, and cannot leave the variant row out. Its `CodeSnippets` component is
+therefore ejected into `src/theme/ApiExplorer/CodeSnippets/index.js` and simplified (one file): one row of tabs
+per language, mixing samples and variants in the order of `themeConfig.languageTabs`, for example
+`{language: 'php', tabs: [{sample: 'Joomla HttpFactory'}, {variant: 'curl', label: 'cURL'}]}`. The chosen language
+and tab are remembered across pages. On an upgrade of the theme, this file must be compared with the new
+original.
+
+**Tested.** All 940 PHP samples pass `php -l`. On a Joomla 6.2.0 site, the Joomla HttpFactory samples were run for
+all list operations and an article create, read, update and delete; the `Joomla.request` samples in a Joomla
+page (list, create, delete with 204, error). The WordPress, Drupal and TYPO3 samples were run against the site
+with Guzzle, which Drupal and TYPO3 use, behind small stand-ins for the CMS functions; they were not run inside
+those CMSs.
+
+**Open points.**
+
+* Run the WordPress, Drupal and TYPO3 samples once in a real installation of each.
+* Keep Python, or replace it by another language?
+* The samples could also follow the request form, by building them in the ejected component instead of in the
+  script. Not needed for now.
 
 ### Are Sergey's component pages still needed with docusaurus-openapi-docs?
 
@@ -165,8 +200,10 @@ From branch `docs/6.2-api-reference-openapi-docs` of the Manual fork (already wo
 1. docusaurus-plugin-openapi-docs and its theme 4.7.1 in a separate docs instance `api-reference`, so the
    rest of the Manual and its search are not affected (the problems of #82). Generated MDX not committed: built in
    CI with `gen-api-docs`.
-2. Add `x-codeSamples` (Joomla HttpFactory, `Joomla.request`) with a script in the specification's tools, and set
-   `languageTabs` (see above).
+2. The code-sample tabs as in the demo (see above): `scripts/openapi-code-samples.js`, the ejected
+   `CodeSnippets` component and `languageTabs`. `npm run gen-api-docs` makes the build copy of the specification
+   and regenerates the pages. Once the specification lives in API-Endpoints, the sample script can move there, so
+   other viewers get the samples too.
 3. Link from `openapi.md` and the component pages to the generated operation pages.
 4. Drop the Scalar, Swagger UI and Stoplight pages of the demo from this PR: one viewer in the Manual.
 
@@ -182,7 +219,7 @@ reference. Check its HttpFactory advice against the answers above (synchronous, 
    specification (in API-Endpoints once step 2 is done).
 2. Replace each component page by the generated tag page, or reduce it to what does not fit in the
    specification. Keep `index.md` (authentication, formats, browser use, CORS, pagination, errors) as the
-   introduction, with one full HttpFactory and one `fetch()` example.
+   introduction, with one full HttpFactory and one `fetch()` example; the code-sample tabs cover the rest.
 3. Redirects from the old component URLs to the new pages.
 
 ### 6. Adding web services to your own component
