@@ -4559,7 +4559,8 @@
                     "catid": 2,
                     "state": 0,
                     "introtext": "<p>Example</p>",
-                    "fulltext": ""
+                    "fulltext": "",
+                    "language": "*"
                   }
                 },
                 "joomlaSite": {
@@ -68583,7 +68584,8 @@
         "additionalProperties": false,
         "required": [
           "title",
-          "catid"
+          "catid",
+          "language"
         ]
       },
       "com_content_post_v1_content_articlesResponse": {

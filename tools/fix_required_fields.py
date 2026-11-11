@@ -28,6 +28,7 @@ FIELD_CONTEXTS = {
 REQUIRED = {
     '/v1/banners/clients': ['extrainfo'],
     '/v1/contacts': ['language'],
+    '/v1/content/articles': ['language'],
     '/v1/menus/site/items': ['alias', 'link'],
     '/v1/menus/administrator': ['client_id'],
     '/v1/modules/site': ['language', 'params'],
@@ -46,6 +47,8 @@ for path in FIELD_CONTEXTS:
 MINIMAL = {
     '/v1/banners/clients': {'name': 'Example client', 'contact': 'Contact person', 'extrainfo': ''},
     '/v1/contacts': {'name': 'Example contact', 'catid': 4, 'language': '*'},
+    '/v1/content/articles': {'title': 'API Example', 'catid': 2, 'state': 0, 'introtext': '<p>Example</p>', 'fulltext': '',
+                             'language': '*'},
     '/v1/menus/site/items': {'title': 'Example item', 'alias': 'example-item', 'menutype': 'mainmenu', 'type': 'url',
                              'link': 'https://example.org'},
     '/v1/menus/administrator': {'title': 'Example admin menu', 'menutype': 'example-admin', 'description': '', 'client_id': 1},

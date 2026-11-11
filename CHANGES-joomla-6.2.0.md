@@ -265,7 +265,8 @@ Made by [`tools/fix_required_fields.py`](tools/fix_required_fields.py), proposed
 [sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1). On a fresh
 Joomla 6.2.0 site, each field was left out of a working create request, one at a time; a field is required when
 the request then fails. All new minimal examples were sent to a freshly reset site and succeed (23 of 23), and all
-captured responses are valid against their schema.
+captured responses are valid against their schema. The minimal article example was added later (2026-11-11): without `language` it
+fails with "Field 'language' doesn't have a default value"; with `"language": "*"` it succeeds.
 
 ### Context and client_id are not applied when creating
 
@@ -289,6 +290,7 @@ The guides `fields.md`, `modules.md` and `menus.md` in the Manual were corrected
 | menu items (site) | `alias`, `link` | database (`path`, `link`) |
 | banner clients | `extrainfo` | database |
 | contacts | `language` | database |
+| articles | `language` | database (found later, when testing the code samples of the Manual) |
 | newsfeeds | `description`, `images`, `metadata`, `metadesc`, `params` | database |
 | template styles | `params` | database |
 | users | `groups` | "You can't save a user account without selecting at least one user group." |
