@@ -9,6 +9,7 @@ A complete [OpenAPI](https://learn.openapis.org/) specification of Joomla's web 
 * `tools/enhance_spec.py`: makes `joomla-6.2.0.json` from the original file (see CHANGES-joomla-6.2.0.md).
 * `tools/fix_required_fields.py`: the required fields and minimal examples of create requests, tested on a fresh site.
 * `tools/capture_responses.py` and `tools/captured-responses.json`: responses of a Joomla 6.2.0 test site, used as examples.
+* `plans/web-services-docs-plan.md`: plan for documenting the Web Services API in the Joomla Manual; `plans/api-ui-plan.md`: comparison of API viewers.
 * `redocly.yaml`: configuration for linting with `npx @redocly/cli lint joomla-6.2.0.json`.
 
 ## Local test site
