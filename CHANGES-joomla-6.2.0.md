@@ -265,8 +265,7 @@ Made by [`tools/fix_required_fields.py`](tools/fix_required_fields.py), proposed
 [sergeytolkachyov/Manual-Joomla-org#1](https://github.com/sergeytolkachyov/Manual-Joomla-org/pull/1). On a fresh
 Joomla 6.2.0 site, each field was left out of a working create request, one at a time; a field is required when
 the request then fails. All new minimal examples were sent to a freshly reset site and succeed (23 of 23), and all
-captured responses are valid against their schema. The minimal article example was added later (2026-11-11): without `language` it
-fails with "Field 'language' doesn't have a default value"; with `"language": "*"` it succeeds.
+captured responses are valid against their schema. Articles and tags were added later (2026-11-11), with the same test.
 
 ### Context and client_id are not applied when creating
 
@@ -290,9 +289,10 @@ The guides `fields.md`, `modules.md` and `menus.md` in the Manual were corrected
 | menu items (site) | `alias`, `link` | database (`path`, `link`) |
 | banner clients | `extrainfo` | database |
 | contacts | `language` | database |
-| articles | `language` | database (found later, when testing the code samples of the Manual) |
+| articles | `language` | database (found later) |
 | newsfeeds | `description`, `images`, `metadata`, `metadesc`, `params` | database |
 | template styles | `params` | database |
+| tags | `parent_id`, `description`, `language` | "Invalid field: Parent"; database (found later) |
 | users | `groups` | "You can't save a user account without selecting at least one user group." |
 | user groups | `parent_id` | "There has to be at least one root usergroup" |
 
@@ -307,8 +307,8 @@ over all contexts. The minimal examples of these requests are replaced by bodies
 
 ### Still failing on a fresh site
 
-`POST /v1/languages/content`, `/v1/media/files`, `/v1/menus/administrator/items`, `/v1/messages`,
-`/v1/redirects` and `/v1/tags` were not part of this work; see the table above.
+`POST /v1/languages/content`, `/v1/media/files`, `/v1/menus/administrator/items`, `/v1/messages` and
+`/v1/redirects` were not part of this work; see the table above.
 
 ### The two forms of `errors`
 

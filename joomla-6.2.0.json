@@ -20638,7 +20638,10 @@
                 "$ref": "#/components/schemas/com_tags_post_v1_tagsRequest"
               },
               "example": {
-                "title": "Example"
+                "title": "Example tag",
+                "parent_id": 1,
+                "description": "",
+                "language": "*"
               }
             }
           }
@@ -159562,7 +159565,10 @@
         },
         "additionalProperties": false,
         "required": [
-          "title"
+          "title",
+          "parent_id",
+          "description",
+          "language"
         ]
       },
       "com_tags_post_v1_tagsResponse": {
